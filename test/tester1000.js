@@ -1,10 +1,14 @@
-const Discord = require('../src');
+'use strict';
+
+const process = require('node:process');
 const { token, prefix, owner } = require('./auth.js');
+const { Client, Intents } = require('../src');
 
 // eslint-disable-next-line no-console
 const log = (...args) => console.log(process.uptime().toFixed(3), ...args);
 
-const client = new Discord.Client({
+const client = new Client({
+  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
   shardCount: 2,
 });
 
@@ -21,7 +25,7 @@ const commands = {
     let res;
     try {
       res = eval(message.content);
-      if (typeof res !== 'string') res = require('util').inspect(res);
+      if (typeof res !== 'string') res = require('node:util').inspect(res);
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error(err.stack);
@@ -29,10 +33,10 @@ const commands = {
     }
     message.channel.send(res, { code: 'js' });
   },
-  ping: message => message.reply('pong'),
+  ping: message => message.channel.send('pong'),
 };
 
-client.on('message', message => {
+client.on('messageCreate', message => {
   if (!message.content.startsWith(prefix) || message.author.bot) return;
 
   message.content = message.content.replace(prefix, '').trim().split(' ');

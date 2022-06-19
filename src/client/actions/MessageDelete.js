@@ -1,6 +1,7 @@
 'use strict';
 
 const Action = require('./Action');
+const { deletedMessages } = require('../../structures/Message');
 const { Events } = require('../../util/Constants');
 
 class MessageDeleteAction extends Action {
@@ -9,10 +10,12 @@ class MessageDeleteAction extends Action {
     const channel = this.getChannel(data);
     let message;
     if (channel) {
+      if (!channel.isText()) return {};
+
       message = this.getMessage(data, channel);
       if (message) {
-        channel.messages.delete(message.id);
-        message.deleted = true;
+        channel.messages.cache.delete(message.id);
+        deletedMessages.add(message);
         /**
          * Emitted whenever a message is deleted.
          * @event Client#messageDelete
@@ -25,6 +28,5 @@ class MessageDeleteAction extends Action {
     return { message };
   }
 }
-
 
 module.exports = MessageDeleteAction;

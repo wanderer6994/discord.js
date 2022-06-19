@@ -6,11 +6,11 @@ const { Events } = require('../../util/Constants');
 class GuildRoleCreate extends Action {
   handle(data) {
     const client = this.client;
-    const guild = client.guilds.get(data.guild_id);
+    const guild = client.guilds.cache.get(data.guild_id);
     let role;
     if (guild) {
-      const already = guild.roles.has(data.role.id);
-      role = guild.roles.add(data.role);
+      const already = guild.roles.cache.has(data.role.id);
+      role = guild.roles._add(data.role);
       /**
        * Emitted whenever a role is created.
        * @event Client#roleCreate
@@ -21,6 +21,5 @@ class GuildRoleCreate extends Action {
     return { role };
   }
 }
-
 
 module.exports = GuildRoleCreate;
